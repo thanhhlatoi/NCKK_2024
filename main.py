@@ -27,7 +27,7 @@ def load_model(imagepath="e1.jpg", conf=0.1):
 def main():
     try:
         clear_crop_directory()  # Xóa tất cả các ảnh trong thư mục results_crop
-        path, boxes = load_model("C:/XuLyAnh/YoloV8/img/ki.jpg")  # Thay đổi đường dẫn đến hình ảnh của bạn
+        path, boxes = load_model("C:/XuLyAnh/YoloV8/img/img_2.png")  # Thay đổi đường dẫn đến hình ảnh của bạn
 
         if boxes:
             cropped_images = crop_and_save(path, boxes)
