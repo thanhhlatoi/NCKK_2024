@@ -32,29 +32,54 @@ def crop_and_save(imagepath, boxes):
     for i, (x_min, y_min, x_max, y_max) in enumerate(boxes):
         crop_img = image[y_min:y_max, x_min:x_max]
         crop_path = f"results_crop/cropped_{i}.jpg"
+        # crop_path = f"results_crop/cropped_0.jpg"
         cv2.imwrite(crop_path, crop_img)
         print(f"Cropped image saved at: {crop_path}")
         cropped_images.append(crop_img)  # Lưu cropped images để xử lý sau này
 
     return cropped_images
 
+# def process_license_plate(cropped_images):
+#     for lp_img in cropped_images:
+#         # Chuyển đổi ảnh biển số về gray
+#         gray = cv2.cvtColor(lp_img, cv2.COLOR_BGR2GRAY)
+#
+#         # Áp dụng threshold để phân tách số và nền
+#         binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+#
+#         # Nhận diện biển số
+#         text = pytesseract.image_to_string(binary, lang="eng", config="--psm 7")
+#
+#         # Fine-tune biển số
+#         fine_tuned_text = fine_tune(text)
+#         print(f"Detected License Plate: {fine_tuned_text}")
+#
+#         # Hiển thị ảnh biển số và kết quả
+#         cv2.imshow("Cropped License Plate", lp_img)
+#         cv2.imshow("Binary License Plate", binary)
+#         cv2.waitKey(0)  # Giữ cửa sổ mở cho đến khi nhấn phím
+#         cv2.destroyAllWindows()  # Đóng cửa sổ sau khi nhấn phím
+
 def process_license_plate(cropped_images):
+    detected_license_plates = []  # List to store detected plates
     for lp_img in cropped_images:
-        # Chuyển đổi ảnh biển số về gray
+        # Convert license plate image to gray
         gray = cv2.cvtColor(lp_img, cv2.COLOR_BGR2GRAY)
 
-        # Áp dụng threshold để phân tách số và nền
+        # Apply threshold to separate text and background
         binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
-        # Nhận diện biển số
+        # Detect text from the binary image
         text = pytesseract.image_to_string(binary, lang="eng", config="--psm 7")
 
-        # Fine-tune biển số
+        # Fine-tune the detected text
         fine_tuned_text = fine_tune(text)
-        print(f"Detected License Plate: {fine_tuned_text}")
+        detected_license_plates.append(fine_tuned_text)  # Add to the list
 
-        # Hiển thị ảnh biển số và kết quả
-        cv2.imshow("Cropped License Plate", lp_img)
-        cv2.imshow("Binary License Plate", binary)
-        cv2.waitKey(0)  # Giữ cửa sổ mở cho đến khi nhấn phím
-        cv2.destroyAllWindows()  # Đóng cửa sổ sau khi nhấn phím
+        # Optionally show images (can be commented out in production)
+        # cv2.imshow("Cropped License Plate", lp_img)
+        # cv2.imshow("Binary License Plate", binary)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    return detected_license_plates  # Return the list of detected plates

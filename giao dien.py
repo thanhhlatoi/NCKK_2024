@@ -42,7 +42,7 @@ class ImageUploader(QWidget):
 
     def uploadImage(self):
         options = QFileDialog.Options()
-        self.imagePath, _ = QFileDialog.getOpenFileName(self, "Select an Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)", options=options)
+        self.imagePath, _ = QFileDialog.getOpenFileName(self, "Chọn một hình ảnh", "", "Hình ảnh (*.png *.jpg *.jpeg *.bmp *.gif)", options=options)
         if self.imagePath:
             self.label.setText(f'Selected: {self.imagePath}')
             self.displayImage()
@@ -53,17 +53,20 @@ class ImageUploader(QWidget):
 
     def confirmImage(self):
         if self.imagePath:
-            license_numbers = self.processImage(self.imagePath)
+            license_numbers = self.processImage(self.imagePath)  # Gọi hàm xử lý hình ảnh
             if license_numbers:
-                self.resultText.append("Detected License Plates:")
-                for number in license_numbers:
-                    self.resultText.append(f"Detected License Plate: {number}")
-            else:
-                self.resultText.append("No license plates detected.")
-        else:
-            self.resultText.setPlainText('No image selected!')
 
-    def processImage(self, imagepath, conf=0.1):
+                for number in license_numbers:
+                    if number:  # Kiểm tra xem biển số có dữ liệu không (không phải chuỗi rỗng)
+                        self.resultText.append(f"Đã phát hiện biển số xe: {number}")
+                if not any(license_numbers):  # Nếu không có biển số hợp lệ nào
+                    self.resultText.append("Không phát hiện thấy biển số xe hợp lệ.")
+            else:
+                self.resultText.append("Không phát hiện biển số xe.")
+        else:
+            self.resultText.setPlainText('Không có hình ảnh nào được chọn!')
+
+    def processImage(self, imagepath, conf=0.8):
         try:
             clear_crop_directory()  # Xóa tất cả các ảnh trong thư mục results_crop
             img = cv2.imread(imagepath)
@@ -80,7 +83,7 @@ class ImageUploader(QWidget):
 
                 if detected_boxes:
                     cropped_images = crop_and_save(imagepath, detected_boxes)
-                    license_numbers = process_license_plate(cropped_images)  # Đảm bảo hàm này trả về danh sách biển số
+                    license_numbers = process_license_plate(cropped_images)  # Gọi hàm này và lưu kết quả
                     return license_numbers if license_numbers else []
                 else:
                     return []

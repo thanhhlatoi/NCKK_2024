@@ -1,12 +1,14 @@
 import os
 import cv2
 from ultralytics import YOLO
+
+from test3 import results
 from test4 import clear_crop_directory, crop_and_save, process_license_plate
 
 # Khởi tạo mô hình YOLOv11
 model = YOLO("C:/XuLyAnh/YoloV8/runs/detect/train/weights/best.pt")
 
-def load_model(imagepath="e1.jpg", conf=0.1):
+def load_model(imagepath, conf=0.1):
     img = cv2.imread(imagepath)
     results = model(imagepath, conf=conf, save=True)
 
@@ -39,3 +41,17 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# from ultralytics import YOLO
+# model = YOLO("yolov8n.pt")
+# if __name__ == '__main__':
+#     train_results = model.train(
+#         data="coco128.yaml",
+#         epochs=1,
+#         device="0",
+#         batch=2,
+#         workers=2
+#     )
+#
+#     results = model("1.png",conf=0.25,save=True)
